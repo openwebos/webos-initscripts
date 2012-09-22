@@ -1,0 +1,49 @@
+# @@@LICENSE
+#
+# Copyright (c) 2007-2012 Hewlett-Packard Development Company, L.P.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# LICENSE@@@
+
+# -*- mode: shell-script; -*-
+
+start on ls-hubd_public-ready
+
+# Make sure variables from early boot are passed through to this job
+env EARLY_BOOT_START
+env EARLY_BOOT_PID
+env EARLY_BOOT_STOP
+
+script
+	# Record upstart timings, for boot performance tracking
+	mkdir -p /tmp/misc-props
+	echo -n $EARLY_BOOT_PID > /tmp/misc-props/pids.early_start
+	echo -n $EARLY_BOOT_START > /tmp/misc-props/timing.early_start
+	echo -n $EARLY_BOOT_STOP > /tmp/misc-props/timing.early_stop
+	echo -n $UPSTART_STARTTIME > /tmp/misc-props/timing.upstart_begin
+	echo -n $$ > /tmp/misc-props/pids.upstart_finish
+	echo -n `date -U` > /tmp/misc-props/timing.upstart_finish
+
+    # generate mark identifying this boot
+    [ -x @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh ] && @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh start
+
+   # If anybody needs to sneak in before we start the race among
+   # components that 'start on stopped finish', this is the place.
+   # run-parts won't return until all of the scripts in
+   # finish-poststart.d return and so the stopped event will be
+   # delayed by that long.
+    if [ -d @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d ]; then
+        run-parts @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d
+    fi
+end script
