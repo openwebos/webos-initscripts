@@ -26,29 +26,30 @@ webos_component(2 0 0)
 
 webos_machine_impl_dep()
 
+# Not installing control-alt-delete or rc0 here are they are
+# already installed on the emulators.
+
 set(configurelist 
-	files/launch/banner
-	files/launch/bootmisc
-	files/launch/cgroups
-	files/launch/console
-	files/launch/control-alt-delete
-	files/launch/crond
-	files/launch/devpts
-	files/launch/finish
-	files/launch/hostname
-	files/launch/modutils
-	files/launch/mountall
-	files/launch/networking
-	files/launch/populate-volatile
-	files/launch/rc0
-	files/launch/reboot
-	files/launch/start_update
-	files/launch/sysfs
-	files/launch/timezone
-	files/launch/tokens
-	files/launch/udev
-	files/launch/urandom
-	files/launch/usbctrl )
+     files/launch/banner
+     files/launch/bootmisc
+     files/launch/cgroups
+     files/launch/console
+     files/launch/crond
+     files/launch/devpts
+     files/launch/finish
+     files/launch/hostname
+     files/launch/modutils
+     files/launch/mountall
+     files/launch/networking
+     files/launch/populate-volatile
+     files/launch/reboot
+     files/launch/start_update
+     files/launch/sysfs
+     files/launch/timezone
+     files/launch/tokens
+     files/launch/udev
+     files/launch/urandom
+     files/launch/usbctrl)
 
 foreach (confitem ${configurelist})
 	webos_build_configured_file(${confitem} UPSTARTCONFDIR "")
@@ -64,8 +65,8 @@ webos_build_configured_file(scripts/public/reboot_ls-hubd_if.sh SBINDIR "")
 
 install(DIRECTORY DESTINATION @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d)
 
+# Not installing files/launch/rcS as it is already installed on the emulator
 install(FILES
-	files/launch/alignment
-	files/launch/rcS
-	DESTINATION @WEBOS_INSTALL_UPSTARTCONFDIR@ )
+        files/launch/alignment
+        DESTINATION @WEBOS_INSTALL_UPSTARTCONFDIR@ )
 
