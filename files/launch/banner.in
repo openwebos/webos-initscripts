@@ -33,5 +33,5 @@ script
         RUNLEVEL=$2
         export PREVLEVEL RUNLEVEL
     fi
-    @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner start
+    @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh start
 end script
