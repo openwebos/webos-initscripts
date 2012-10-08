@@ -63,10 +63,10 @@ endif(${WEBOS_TARGET_MACHINE_IMPL} STREQUAL simulator)
 
 webos_build_configured_file(scripts/public/reboot_ls-hubd_if.sh SBINDIR "")
 
-install(DIRECTORY DESTINATION @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d)
+install(DIRECTORY DESTINATION ${WEBOS_INSTALL_UPSTARTCONFDIR}/finish-poststart.d)
 
 # Not installing files/launch/rcS as it is already installed on the emulator
 install(FILES
         files/launch/alignment
-        DESTINATION @WEBOS_INSTALL_UPSTARTCONFDIR@ )
+        DESTINATION ${WEBOS_INSTALL_UPSTARTCONFDIR} )
 
