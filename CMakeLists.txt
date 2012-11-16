@@ -21,8 +21,8 @@ cmake_minimum_required(VERSION 2.8.7)
 project(webos-initscripts NONE)
 
 include(webOS/webOS)
-webos_modules_init(1 0 0 QUALIFIER RC3)
-webos_component(2 0 0)
+webos_modules_init(1 0 0 QUALIFIER RC4)
+webos_component(2 1 0)
 
 webos_machine_impl_dep()
 
@@ -33,7 +33,6 @@ set(configurelist
      files/launch/banner
      files/launch/bootmisc
      files/launch/cgroups
-     files/launch/console
      files/launch/crond
      files/launch/devpts
      files/launch/finish
