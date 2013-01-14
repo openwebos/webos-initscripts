@@ -33,5 +33,9 @@ script
         RUNLEVEL=$2
         export PREVLEVEL RUNLEVEL
     fi
-    @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh start
+    if [ -e @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh ]; then
+        @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh start       # Open webOS name
+    else
+        @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner start          # SYSV name
 end script
+
