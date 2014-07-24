@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,7 @@
 #
 # LICENSE@@@
 
-# -*- mode: shell-script; -*-
-
-# this is a fake job that exists only so somebody can say 'start -n
-# start_update'.  In order to be a legal upstart job, however, it must
-# have an exec or script line
+description "pseudo-job so that 'start start_update' can be run"
 
 # Jobfiles for daemons that ought to be stopped during an update can
 # simply "stop on started start_update".  But tasks cannot: they are
@@ -30,11 +26,8 @@
 # upstart will still emit a "started" event to every jobfile down the
 # line.  We don't want that.  For now, just list them here.
 
-# The call to stop networking is done in the stop_comms script, in the
-# shutdownscripts component.
-
 script
-    for script in mountnfs.sh bootmisc.sh finish; do
-        @WEBOS_INSTALL_SYSCONFDIR@/init.d/${script} stop
-    done
+	for script in mountnfs.sh bootmisc.sh finish; do
+		@WEBOS_INSTALL_SYSCONFDIR@/init.d/${script} stop
+	done
 end script

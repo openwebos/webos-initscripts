@@ -1,0 +1,51 @@
+# @@@LICENSE
+#
+# Copyright (c) 2007-2014 LG Electronics, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# LICENSE@@@
+
+description "Mount filesystems"
+
+start on stopped cgroups
+
+console output
+
+# for some reason we're getting a return of 64 from this mount command - work around for now:
+normal exit 0 64
+
+exec mount -at nonfs,nosmbfs,noncpfs 2>/dev/null
+
+# Stuff to do after we're sure our separate @WEBOS_INSTALL_LOCALSTATEDIR@ exists
+post-stop script
+	if grep -qs "qemu" /etc/hostname
+	then
+		# clear out temporary contents instead of mounting as tmpfs for emulator
+		mount -o remount,rw /
+		# clear out temporary contents instead of mounting as tmpfs for emulator
+		rm -rf /tmp/*
+	fi
+
+	# Create @WEBOS_INSTALL_LOCALSTATEDIR@/preferences directory
+	if [ -f @WEBOS_INSTALL_LOCALSTATEDIR@/preferences ]; then
+		rm @WEBOS_INSTALL_LOCALSTATEDIR@/preferences || true
+	fi # nuke 'preferences' if it is a file, not dir
+	if [ ! -d @WEBOS_INSTALL_LOCALSTATEDIR@/preferences ]; then
+		mkdir -p @WEBOS_INSTALL_LOCALSTATEDIR@/preferences || true
+		chown root @WEBOS_INSTALL_LOCALSTATEDIR@/preferences || true
+		chmod 777 @WEBOS_INSTALL_LOCALSTATEDIR@/preferences || true
+	fi
+	mkdir -p @WEBOS_INSTALL_LOCALSTATEDIR@/home/root || true
+	mkdir -p @WEBOS_INSTALL_PRESERVEDTMPDIR@ || true
+end script

@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,53 +22,32 @@ project(webos-initscripts NONE)
 
 include(webOS/webOS)
 webos_modules_init(1 0 0 QUALIFIER RC4)
-webos_component(2 2 0)
+#webos_component(3 0 0)
+webos_component(2 0 0)
 
 webos_machine_impl_dep()
 
-# Not installing control-alt-delete or rc0 here are they are
-# already installed on the emulators.
+webos_configure_source_files(configurelist 
+    files/launch/banner.conf
+    files/launch/bootmisc.conf
+    files/launch/cgroups.conf
+    files/launch/crond.conf
+    files/launch/init-boot-done.conf
+    files/launch/modutils.conf
+    files/launch/mountall.conf
+    files/launch/networking.conf
+    files/launch/populate-volatile.conf
+    files/launch/reboot.conf
+    files/launch/SetInitEnv.conf
+    files/launch/start_update.conf
+    files/launch/timezone.conf
+    files/launch/udev.conf
+    files/launch/urandom.conf
+    files/launch/usbctrl.conf)
 
-set(configurelist 
-    files/launch/banner
-    files/launch/bootmisc
-    files/launch/cgroups
-    files/launch/crond
-    files/launch/devpts
-    files/launch/finish
-    files/launch/hostname
-    files/launch/modutils
-    files/launch/mountall
-    files/launch/networking
-    files/launch/populate-volatile
-    files/launch/reboot
-    files/launch/start_update
-    files/launch/sysfs
-    files/launch/timezone
-    files/launch/tokens
-    files/launch/udev
-    files/launch/urandom
-    files/launch/usbctrl)
+install(FILES ${configurelist} DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
+# unconfigured job files:
+install(FILES files/launch/alignment.conf files/launch/console.conf files/launch/devpts.conf files/launch/sysctl.conf DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
 
-foreach (confitem ${configurelist})
-	webos_build_configured_file(${confitem} UPSTARTCONFDIR "")
-endforeach()
-
-if(${WEBOS_TARGET_MACHINE_IMPL} STREQUAL simulator)
-	webos_build_configured_file(files/launch/swaphack SYSCONFDIR event.dis)
-else()
-	webos_build_configured_file(files/launch/swaphack SYSCONFDIR event.d)
-	webos_build_configured_file(files/launch/rc0 UPSTARTCONFDIR "")
-endif(${WEBOS_TARGET_MACHINE_IMPL} STREQUAL simulator)
-
-webos_build_configured_file(scripts/public/reboot_ls-hubd_if.sh SBINDIR "")
-
-install(DIRECTORY DESTINATION ${WEBOS_INSTALL_UPSTARTCONFDIR}/finish-poststart.d)
-
-install(FILES files/launch/alignment DESTINATION ${WEBOS_INSTALL_UPSTARTCONFDIR} )
-
-# files/launch/rcS is already installed on the emulator.
-if(NOT(${WEBOS_TARGET_MACHINE_IMPL} STREQUAL simulator))
-	install(FILES files/launch/rcS DESTINATION ${WEBOS_INSTALL_UPSTARTCONFDIR} )
-endif(NOT(${WEBOS_TARGET_MACHINE_IMPL} STREQUAL simulator))
+install(DIRECTORY DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init/finish-poststart.d)
 

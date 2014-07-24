@@ -1,0 +1,54 @@
+# @@@LICENSE
+#
+# Copyright (c) 2013-2014 LG Electronics, Inc.
+#
+# Confidential computer software. Valid license from LG required for
+# possession, use or copying. Consistent with FAR 12.211 and 12.212,
+# Commercial Computer Software, Computer Software Documentation, and
+# Technical Data for Commercial Items are licensed to the U.S. Government
+# under vendor's standard commercial license.
+#
+# LICENSE@@@
+
+description "SetInitEnv - setup the global environment for all upstart (init) scripts"
+
+start on startup
+
+task
+
+# Comment this line out to suppress logs on the console
+#console output
+
+script
+	# Ensure the system date is no earlier than "2014-02-28 00:00:00 UTC"
+	earliest_date=$(date -u -d '2014-02-28 00:00:00' +'%s')
+	if [ $(date -u -S) -lt $earliest_date ]; then
+		date -u -S -s $earliest_date
+	fi
+	
+	# turn down the logging or we see a whole list of jobs for each of these commands!
+	initctl log-priority error
+
+	# from /etc/default/rcS
+	RCS="TMPTIME=0 \
+		SULOGIN=no \
+		DELAYLOGIN=no \
+		VERBOSE=no \
+		EDITMOTD=no \
+		ENABLE_ROOTFS_FSCK=no \
+		FSCKFIX=yes \
+		VOLATILE_ENABLE_CACHE=yes \
+		ROOTFS_READ_ONLY=no "
+
+	# General settings
+	GENERAL="HOME=@WEBOS_INSTALL_HOMEDIR@/root \
+		PATH=/usr/sbin:/usr/bin:/sbin:/bin \
+		KDRV_DIR=/mnt/lg/res/lglib/kdrv \
+		LGAPP_DIR=/mnt/lg/lgapp \
+		RWMOUNT_FLAG=/tmp/mount-readwrite.conf.done \
+		QT_VER=qt5"
+
+	initctl set-env --global $RCS $GENERAL 
+
+	initctl log-priority warn
+end script

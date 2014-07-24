@@ -1,0 +1,47 @@
+# @@@LICENSE
+#
+# Copyright (c) 2014 LG Electronics, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# LICENSE@@@
+
+description "Mount cgroups if they available in system"
+
+start on stopped modutils
+
+# Comment this line out to suppress logs on the console
+#console output
+
+pre-start script
+    mkdir /sys/fs/cgroup || true
+end script
+
+script
+    if [ -d /sys/fs/cgroup ] && ! grep 'cgroup' /proc/self/mountinfo; then
+        if grep -qs cgroup /proc/filesystems; then
+            local opts="nodev,noexec,nosuid,mode=755,size=${rc_cgroupsize:-10m}"
+            mount -n -t tmpfs -o ${opts} cgroup_root /sys/fs/cgroup
+
+             while read name hier groups enabled rest; do
+                case "${enabled}" in
+                        1)      mkdir /sys/fs/cgroup/${name}
+                                mount -n -t cgroup -o nodev,noexec,nosuid,${name} \
+                                        ${name} /sys/fs/cgroup/${name}
+                                ;;
+                esac
+            done < /proc/cgroups
+        fi
+    fi
+end script
+

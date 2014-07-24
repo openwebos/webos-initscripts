@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,10 @@
 #
 # LICENSE@@@
 
-# -*- mode: conf; -*-
+description "Upstart to sysv shim to run networking start script"
 
-start on stopped mountall
+start on stopped usbctrl
 
 console output
 
-pre-start script
-    test -x @WEBOS_INSTALL_BINDIR@/tzset || stop
-end script
-
-script
-    @WEBOS_INSTALL_BINDIR@/tzset -u
-    @WEBOS_INSTALL_BINDIR@/tzset
-end script
+exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/networking start

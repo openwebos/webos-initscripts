@@ -1,0 +1,82 @@
+# @@@LICENSE
+#
+# Copyright (c) 2013-2014 LG Electronics, Inc.
+#
+# Confidential computer software. Valid license from LG required for
+# possession, use or copying. Consistent with FAR 12.211 and 12.212,
+# Commercial Computer Software, Computer Software Documentation, and
+# Technical Data for Commercial Items are licensed to the U.S. Government
+# under vendor's standard commercial license.
+#
+# LICENSE@@@
+
+start on runlevel 6
+
+console output
+
+# If we are rebooting due to an ls-hubd_private crash, none of the luna-send commands can work.
+# This is marked in the global environment by ls-hubd_watchdog with LS_HUBD_CRASH=ls-hubd_private.
+#
+# Note that for most reboots LS_HUBD_CRASH will be NULL (i.e. un-set) so the negative test
+# for ls-hubd_private selects all other reboot causes.
+#
+# Check to see if PmLogDaemon and sleepd are running, as those two are the targets
+# of the various luna-send commands.  If those procs are not running, luna-send will wait
+# "forever" for a response.  For the logger we just avoid running those luna-sends,
+# but if sleep is not running we can still reboot using '/sbin/reboot -f' which bypasses
+# this job and talks directly to the kernel.
+
+script
+	pwroff_reason=$(cat /tmp/poweroff_reason 2>/dev/null | awk 'BEGIN { FS="=";} /poweroff_reason/ {print $2} END{}')
+	if [ -z $pwroff_reason ] ; then
+		if [ "$LS_HUBD_CRASH" != "" ] ; then
+			# There was a crash - do not care which ls-hubd right here
+			pwroff_reason="watchdog"
+		else
+			pwroff_reason="unknown"
+		fi
+	fi
+
+	PIDL=`pidof PmLogDaemon` || true
+	if [ "$LS_HUBD_CRASH" != "ls-hubd_private" -a "$PIDL" != "" ] ; then
+		# leave a note to tell why we rebooted
+		PmLogCtl logkv . info REBOOT_REASON reason=\"$pwroff_reason\" "from reboot.conf" || true
+		PmLogCtl flush || true
+	fi
+
+	echo "[REBOOT] - before stop urandom call "
+	# see comment below about dbus - logic is the same
+	initctl set-env --global URANDOM_TASK=STOP
+	initctl start urandom || true
+
+	echo "[REBOOT] - before log priority call"
+	initctl log-priority info
+
+	echo "[REBOOT] - before stop dbus call "
+	# counterintuitive to 'stop' dbus by 'start'ing dbus, but the current dbus.conf simply calls
+	# init.d/dbus-1 with start or stop - so the Upstart dbus job does not remain running and so
+	# it cannot be stopped.  Use the global set-env to pass the correct task to the Upstart dbus.
+	# Since we're about to reboot we don't need to worry about cleaning DBUS_TASK from the env.
+	initctl set-env --global DBUS_TASK=DBUS_STOP
+	initctl start dbus || true
+
+	echo "[REBOOT] - before stop db8 call"
+	initctl stop db8 || true
+
+	sync
+	PIDS=`pidof sleepd` || true
+	# since we have an alternative means of rebooting the TV, test for sleepd running also
+	if [ "$LS_HUBD_CRASH" != "ls-hubd_private" -a "$PIDS" != "" ] ; then
+		# this block needs ls-hubd_private and sleepd
+		luna-send -n 1 luna://com.palm.sleep/shutdown/initiate "{}"
+		echo "[REBOOT] - umount command"
+		for drive in `mount | grep "/dev/sd" | awk '{ print $1}'`
+		do
+			umount $drive
+		done
+		luna-send -n 1 luna://com.palm.sleep/shutdown/machineReboot '{"reason":"$pwroff_reason"}'
+	else
+		# since we can't tell sleepd to reboot, we tell the kernel to do it for us
+		/sbin/reboot -f
+	fi
+end script

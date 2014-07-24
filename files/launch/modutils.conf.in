@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 #
 # LICENSE@@@
 
-# -*- mode: conf; -*-
+description "Upstart to sysv shim to run modutils script"
 
-start on stopped devpts
+start on stopped alignment
 
-exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/hostname.sh start
+exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/modutils.sh start

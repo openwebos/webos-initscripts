@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 #
 # LICENSE@@@
 
-# -*- mode: shell-script; -*-
+description "Job that marks the 'end' of the system boot: usually used to start most normal jobs"
 
-start on ls-hubd_public-ready
+start on stopped adbd
+emits init-boot-done
 
 # Make sure variables from early boot are passed through to this job
 env EARLY_BOOT_START
@@ -26,6 +27,8 @@ env EARLY_BOOT_PID
 env EARLY_BOOT_STOP
 
 script
+	initctl emit --no-wait init-boot-done
+
 	# Record upstart timings, for boot performance tracking
 	mkdir -p /tmp/misc-props
 	echo -n $EARLY_BOOT_PID > /tmp/misc-props/pids.early_start
@@ -35,15 +38,17 @@ script
 	echo -n $$ > /tmp/misc-props/pids.upstart_finish
 	echo -n `date -U` > /tmp/misc-props/timing.upstart_finish
 
-    # generate mark identifying this boot
-    [ -x @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh ] && @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh start
+	# generate mark identifying this boot
+	[ -x @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh ] && @WEBOS_INSTALL_SYSCONFDIR@/init.d/bootmark.sh start
 
-   # If anybody needs to sneak in before we start the race among
-   # components that 'start on stopped finish', this is the place.
-   # run-parts won't return until all of the scripts in
-   # finish-poststart.d return and so the stopped event will be
-   # delayed by that long.
-    if [ -d @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d ]; then
-        run-parts @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d
-    fi
+	initctl emit --no-wait init-boot-done
+
+	# If anybody needs to sneak in before we start the race among
+	# components that 'start on init-boot-done', this is the place.
+	# run-parts won't return until all of the scripts in
+	# finish-poststart.d return and so the stopped event will be
+	# delayed by that long.
+	if [ -d @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d ]; then
+		run-parts @WEBOS_INSTALL_UPSTARTCONFDIR@/finish-poststart.d
+	fi
 end script

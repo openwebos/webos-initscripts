@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2013 LG Electronics, Inc.
+# Copyright (c) 2007-2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,17 @@
 #
 # LICENSE@@@
 
-# -*- mode: shell-script; -*-
+description "Job to add a banner to the console"
 
-start on stopped populate-volatile
+start on stopped SetInitEnv
 
 console output
 
-exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/devpts.sh start
+script
+	if [ -e @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh ]; then
+		@WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh start       # Open webOS name
+	else
+		@WEBOS_INSTALL_SYSCONFDIR@/init.d/banner start          # SYSV name
+	fi
+end script
+
