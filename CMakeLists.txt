@@ -21,9 +21,8 @@ cmake_minimum_required(VERSION 2.8.7)
 project(webos-initscripts NONE)
 
 include(webOS/webOS)
-webos_modules_init(1 0 0 QUALIFIER RC4)
-#webos_component(3 0 0)
-webos_component(2 0 0)
+webos_modules_init(1 0 0 QUALIFIER RC7)
+webos_component(3 0 0)
 
 webos_machine_impl_dep()
 
