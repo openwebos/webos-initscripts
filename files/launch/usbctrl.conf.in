@@ -18,10 +18,9 @@
 
 description "Configure usbnet and novacom if enabled"
 
-# Currently this won't work in our image - modprobe isn't happy right now
-#start on stopped mountall
+start on stopped mountall
 
-console output
+#console output
 
 script
 	# If dropbear is in the image the we should be on an eng image

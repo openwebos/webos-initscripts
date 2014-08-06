@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-# Copyright (c) 2007-2014 LG Electronics, Inc.
+# Copyright (c) 2014 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 description "Job that marks the 'end' of the system boot: usually used to start most normal jobs"
 
-start on stopped adbd
+start on ls-hubd_public-ready
 emits init-boot-done
 
 # Make sure variables from early boot are passed through to this job

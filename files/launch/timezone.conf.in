@@ -20,7 +20,7 @@ description "Set the timezone at bootup"
 
 start on stopped mountall
 
-console output
+#console output
 
 pre-start script
 	test -x @WEBOS_INSTALL_BINDIR@/tzset || stop

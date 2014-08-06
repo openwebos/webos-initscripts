@@ -1,0 +1,56 @@
+# @@@LICENSE
+#
+# Copyright (c) 2014 LG Electronics, Inc.
+#
+# Confidential computer software. Valid license from LG required for
+# possession, use or copying. Consistent with FAR 12.211 and 12.212,
+# Commercial Computer Software, Computer Software Documentation, and
+# Technical Data for Commercial Items are licensed to the U.S. Government
+# under vendor's standard commercial license.
+#
+# LICENSE@@@
+
+start on runlevel [01]
+
+#console output
+
+script
+	echo "[SHUTDOWN] - before wlan0 down"
+	ifconfig wlan0 down &
+
+	PIDL=`pidof PmLogDaemon` || true
+	if [ "$PIDL" != "" ] ; then
+		# leave a note to explain why we're shutting down
+		PmLogCtl logkv . info SHUTDOWN_REASON reason=\"$pwroff_reason\" "from shutdown.conf" || true
+		PmLogCtl flush || true
+	fi
+
+	echo "[SHUTDOWN] - before log priority call"
+	initctl log-priority info
+
+	echo "[SHUTDOWN] - before stop dbus call "
+	initctl stop dbus || true
+
+	echo "[SHUTDOWN] - call luna-send to sleepd to shutdown"
+
+	PIDS=`pidof sleepd` || true
+	if [ "$PIDS" != "" ] ; then
+		luna-send -n 1 -w 20 luna://com.palm.sleep/shutdown/initiate "{}"
+	fi
+
+	echo "[SHUTDOWN] - remount RW partitions as RO to block write access before shutdown"
+	echo "u" > /proc/sysrq-trigger || true
+
+	sync
+
+	echo "[SHUTDOWN] - umount command"
+	for drive in `mount | grep "/dev/sd" | awk '{ print $1}'`
+		do
+			umount $drive
+		done
+	fi
+
+	#TODO: Change to a powerd call
+	echo "Shutting down system"
+
+end script

@@ -20,6 +20,6 @@ description "Upstart to sysv shim to run networking start script"
 
 start on stopped usbctrl
 
-console output
+#console output
 
 exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/networking start

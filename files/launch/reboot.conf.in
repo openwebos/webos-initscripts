@@ -12,7 +12,7 @@
 
 start on runlevel 6
 
-console output
+#console output
 
 # If we are rebooting due to an ls-hubd_private crash, none of the luna-send commands can work.
 # This is marked in the global environment by ls-hubd_watchdog with LS_HUBD_CRASH=ls-hubd_private.

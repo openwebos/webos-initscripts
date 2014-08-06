@@ -31,6 +31,7 @@ webos_configure_source_files(configurelist
     files/launch/bootmisc.conf
     files/launch/cgroups.conf
     files/launch/crond.conf
+    files/launch/dbus.conf
     files/launch/init-boot-done.conf
     files/launch/modutils.conf
     files/launch/mountall.conf
@@ -38,6 +39,7 @@ webos_configure_source_files(configurelist
     files/launch/populate-volatile.conf
     files/launch/reboot.conf
     files/launch/SetInitEnv.conf
+    files/launch/shutdown.conf
     files/launch/start_update.conf
     files/launch/timezone.conf
     files/launch/udev.conf
@@ -46,7 +48,13 @@ webos_configure_source_files(configurelist
 
 install(FILES ${configurelist} DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
 # unconfigured job files:
-install(FILES files/launch/alignment.conf files/launch/console.conf files/launch/devpts.conf files/launch/sysctl.conf DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
+install(FILES 
+    files/launch/alignment.conf
+    files/launch/console.conf
+    files/launch/devpts.conf
+    files/launch/dropbear.conf
+    files/launch/sysctl.conf 
+    DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
 
 install(DIRECTORY DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init/finish-poststart.d)
 

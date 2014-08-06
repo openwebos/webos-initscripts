@@ -20,7 +20,7 @@ description "Job to add a banner to the console"
 
 start on stopped SetInitEnv
 
-console output
+#console output
 
 script
 	if [ -e @WEBOS_INSTALL_SYSCONFDIR@/init.d/banner.sh ]; then

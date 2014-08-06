@@ -20,6 +20,6 @@ description "Upstart to sysv shim to run udev script"
 
 start on stopped mountall
 
-console output
+#console output
 
 exec @WEBOS_INSTALL_SYSCONFDIR@/init.d/udev start

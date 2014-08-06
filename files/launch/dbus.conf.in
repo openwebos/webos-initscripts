@@ -1,0 +1,56 @@
+# @@@LICENSE
+#
+#      Copyright (c) 2014 LG Electronics, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# LICENSE@@@
+
+description "D-Bus daemon start"
+
+start on ls-hubd_public-ready
+
+# Comment this line out to suppress logs on the console
+#console output
+env DAEMON="/usr/bin/dbus-daemon"
+env NAME="dbus"
+env DAEMONUSER="messagebus"           # must match /etc/dbus-1/system.conf
+env PIDFILE="/var/run/dbus/pid" # must match /etc/dbus-1/system.conf
+env UUIDDIR="/var/lib/dbus"
+env DESC="system message bus"
+env EVENTDIR="/etc/dbus-1/event.d"
+
+script
+	mkdir -p "`dirname $PIDFILE`" || true
+	if [ -e $PIDFILE ]; then
+		PIDDIR=/proc/$(cat $PIDFILE)
+		if [ -d ${PIDDIR} -a  "$(readlink -f ${PIDDIR}/exe)" = "${DAEMON}" ]; then
+			echo "$DESC already started; not starting."
+		else
+			echo "Removing stale PID file $PIDFILE."
+			rm -f $PIDFILE
+		fi
+	fi
+	if [ ! -d $UUIDDIR ]; then
+		mkdir -p $UUIDDIR || true
+		chown $DAEMONUSER $UUIDDIR || true
+		chgrp $DAEMONUSER $UUIDDIR || true
+	fi
+
+	dbus-uuidgen --ensure
+
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --user $DAEMONUSER --exec $DAEMON -- --system
+	if [ -d $EVENTDIR ]; then
+		run-parts --arg=start $EVENTDIR
+	fi
+end script

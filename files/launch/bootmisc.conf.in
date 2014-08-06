@@ -34,5 +34,10 @@ script
         cat /dev/null > @WEBOS_INSTALL_LOGDIR@/wtmp || true
         chgrp utmp @WEBOS_INSTALL_RUNTIMEINFODIR@/utmp @WEBOS_INSTALL_LOGDIR@/wtmp || true
         chmod 0664 @WEBOS_INSTALL_RUNTIMEINFODIR@/utmp @WEBOS_INSTALL_LOGDIR@/wtmp || true
+
+	if grep -qs "qemu" /etc/hostname
+	then
+		/sbin/modprobe uvesafb mode_option=320x320-32
+	fi
 end script
 

@@ -20,7 +20,7 @@ description "Mount filesystems"
 
 start on stopped cgroups
 
-console output
+#console output
 
 # for some reason we're getting a return of 64 from this mount command - work around for now:
 normal exit 0 64
