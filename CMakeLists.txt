@@ -32,6 +32,7 @@ webos_configure_source_files(configurelist
     files/launch/cgroups.conf
     files/launch/crond.conf
     files/launch/dbus.conf
+    files/launch/dropbear.conf
     files/launch/init-boot-done.conf
     files/launch/modutils.conf
     files/launch/mountall.conf
@@ -51,9 +52,10 @@ install(FILES ${configurelist} DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
 install(FILES 
     files/launch/alignment.conf
     files/launch/console.conf
+    files/launch/connman.conf
     files/launch/devpts.conf
-    files/launch/dropbear.conf
     files/launch/sysctl.conf 
+    files/launch/wpa-supplicant.conf
     DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init)
 
 install(DIRECTORY DESTINATION ${WEBOS_INSTALL_SYSCONFDIR}/init/finish-poststart.d)

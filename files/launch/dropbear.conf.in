@@ -27,14 +27,14 @@ respawn
 #console output
 
 pre-start script
-        mkdir -p /var/lib/dropbear || true
-        if [ ! -f /var/lib/dropbear/dropbear_rsa_host_key ]; then
-                logger "generating /var/lib/dropbear/dropbear_rsa_host_key"
-                /usr/sbin/dropbearkey -t rsa -f /var/lib/dropbear/dropbear_rsa_host_key
+        mkdir -p @WEBOS_INSTALL_EXECSTATEDIR@/dropbear || true
+        if [ ! -f @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_rsa_host_key ]; then
+                logger "generating @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_rsa_host_key"
+                @WEBOS_INSTALL_SBINDIR@/dropbearkey -t rsa -f @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_rsa_host_key
         fi
-        if [ ! -f /var/lib/dropbear/dropbear_dss_host_key ]; then
-                logger "generating /var/lib/dropbear/dropbear_dss_host_key"
-                /usr/sbin/dropbearkey -t dss -f /var/lib/dropbear/dropbear_dss_host_key
+        if [ ! -f @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_dss_host_key ]; then
+                logger "generating @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_dss_host_key"
+                @WEBOS_INSTALL_SBINDIR@/dropbearkey -t dss -f @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_dss_host_key
         fi
 
         # dropbear expects /var/log/lastlog, so touch, and use /bin/true
@@ -42,5 +42,4 @@ pre-start script
         [ -e /var/log/lastlog ] || touch /var/log/lastlog || /bin/true
 end script
 
-exec /usr/sbin/dropbear -B -F -d /var/lib/dropbear/dropbear_dss_host_key -r /var/lib/dropbear/dropbear_rsa_host_key
-
+exec @WEBOS_INSTALL_SBINDIR@/dropbear -B -F -d @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_dss_host_key -r @WEBOS_INSTALL_EXECSTATEDIR@/dropbear/dropbear_rsa_host_key
