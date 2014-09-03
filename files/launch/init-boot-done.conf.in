@@ -19,7 +19,12 @@
 description "Job that marks the 'end' of the system boot: usually used to start most normal jobs"
 
 start on ls-hubd_public-ready
+
+emits minimal-boot-done
+emits core-boot-done
 emits init-boot-done
+emits rest-boot-done
+emits datastore-init-start
 
 # Make sure variables from early boot are passed through to this job
 env EARLY_BOOT_START
@@ -27,7 +32,11 @@ env EARLY_BOOT_PID
 env EARLY_BOOT_STOP
 
 script
+	initctl emit --no-wait minimal-boot-done
+	initctl emit --no-wait core-boot-done
 	initctl emit --no-wait init-boot-done
+	initctl emit --no-wait rest-boot-done
+	initctl emit --no-wait datastore-init-start
 
 	# Record upstart timings, for boot performance tracking
 	mkdir -p /tmp/misc-props
